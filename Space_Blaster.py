@@ -413,7 +413,7 @@ def main():
         draw_text(f"Vies : {'*'*player.lives}", WIDTH - 120, 10, (255, 0, 0))
         draw_text(f"Niveau : {level}", WIDTH // 2 - 60, 10, (0, 255, 255))
         draw_text(f"v. player : {player.speed(level)}", 10, HEIGHT-30)
-        draw_text(f"V. Enemy : {Enemy.add_speed(level)}", WIDTH-200, HEIGHT-30)
+        draw_text(f"V. Enemy : + {Enemy.add_speed(level) :.2f}", WIDTH-200, HEIGHT-30)
         pygame.display.flip()
 
     pygame.quit()
