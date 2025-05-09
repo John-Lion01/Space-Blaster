@@ -48,6 +48,32 @@ menu_font = pygame.font.SysFont(None, 48)
 title_font = pygame.font.SysFont(None, 80)
 info_font = pygame.font.SysFont(None, 36)
 
+# Sauvegarde pour l'exécutable Sous Windows → devient : C:\Users\nom_utilisateur\.mon_jeu:
+# import shutil
+# def chemin_sauvegarde():
+#     dossier = os.path.expanduser("~/.Space_Blaster")
+#     os.makedirs(dossier, exist_ok=True)  # Créé le dossier s'il n'existe pas
+#     return os.path.join(dossier, "sauvegarde.json")
+
+# def initialiser_sauvegarde():
+#     chemin = chemin_sauvegarde()
+#     if not os.path.exists(chemin):
+#         shutil.copy(os.path.join(os.getenv('APPDATA'), "Space_Blaster", "save_template.json"), chemin)
+
+# initialiser_sauvegarde()
+
+# def sauvegarder_progression(data):
+#     with open(chemin_sauvegarde(), "w") as f:
+#         json.dump(data, f, indent=4)
+
+# def charger_progression():
+#     chemin = chemin_sauvegarde()
+#     if os.path.exists(chemin):
+#         with open(chemin, "r") as f:
+#             return json.load(f)
+#     else:
+#         return {"niveau_max": 1, "score_max": 0}  # Ou valeurs par défaut
+
 # --- Sauvegarde ---
 def charger_progression():
     if os.path.exists(SAVE_FILE):
@@ -57,7 +83,7 @@ def charger_progression():
 
 def sauvegarder_progression(data):
     with open(SAVE_FILE, 'w') as f:
-        print("Sauvegarde................", data)
+        # print("Sauvegarde................", data)
         json.dump(data, f, indent=4)
 
 save_data = charger_progression()
