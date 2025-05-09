@@ -1,4 +1,13 @@
 # -*- coding: utf-8 -*-
+# #####################################################################
+# Name : Space Blaster
+# Purpose :  jeu de tir en 2D; vaisseau spatial;
+# Author : DJANTA M. Jean
+# Createdd : 16/04/2025
+# Last Updated : 09/05/2025
+# #######################################################################
+
+ 
 # Modules
 import pygame
 import sys
@@ -292,6 +301,7 @@ def main():
             show_level_select_screen()
             level_select = False
 
+        # Pause
         if pause:
             screen.fill((20, 20, 40))
             for i, option in enumerate(pause_options):
@@ -301,6 +311,7 @@ def main():
             pygame.display.flip()
             continue
 
+        # Game over
         if game_over:
             draw_centered_text("GAME OVER - Appuie sur R pour recommencer", HEIGHT // 2, font, (255, 255, 0))
             if keys[pygame.K_r]:
@@ -311,11 +322,12 @@ def main():
                 explosions.clear()
                 bonuses.clear()
                 score = 0
-                level = level
+                level = 1
                 game_over = False
             pygame.display.flip()
             continue
-
+        
+        # déplacement du joueur
         player.move(keys, level)
 
         # Tir
