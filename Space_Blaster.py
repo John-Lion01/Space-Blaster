@@ -101,17 +101,17 @@ def draw_centered_text(text, y, font, color=(255, 255, 255)):
 def show_level_select_screen():
     global level
     selecting = True
-    button_size = 40
-    margin = 5
-    cols = 15
-    rows = 20
+    button_size = 60
+    margin = 10
+    cols = 10
+    rows = 7
     while selecting:
         screen.fill((10, 10, 30))
         draw_centered_text("Choisis ton niveau", 30, menu_font)
         for i in range(min(LEVEL_COUNT, cols * rows)):
             col = i % cols
             row = i // cols
-            x = 40 + col * (button_size + margin)
+            x = 50 + col * (button_size + margin)
             y = 80 + row * (button_size + margin)
             rect = pygame.Rect(x, y, button_size, button_size)
             level_num = i + 1
@@ -339,7 +339,9 @@ def main():
 
         # Game over
         if game_over:
-            draw_centered_text("GAME OVER - Appuie sur R pour recommencer", HEIGHT // 2, font, (255, 255, 0))
+            draw_centered_text("GAME OVER - Appuie sur R pour recommencer", HEIGHT // 2 - 50, font, (255, 255, 0))
+            draw_text(f"Niveau : {level}", WIDTH//2, HEIGHT//2)
+            draw_text(f"Score : {score}", WIDTH//2, HEIGHT//2 + 50)
             if keys[pygame.K_r]:
                 player.reset()
                 # player.speed += player.speed(level)
