@@ -100,7 +100,7 @@ def draw_centered_text(text, y, font, color=(255, 255, 255)):
 
 def show_level_select_screen():
     global level
-    selecting = True
+    selecting = True 
     button_size = 60
     margin = 10
     cols = 10
