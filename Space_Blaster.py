@@ -17,9 +17,24 @@ import json
 
 # --- Constantes ---
 WIDTH, HEIGHT = 800, 600
-BLACK = (0, 0, 0)
 FPS = 60
 LEVEL_COUNT = 500
+
+# COLORS 
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+GREEN = (0, 255, 0)
+BLUE_NAVY = (0, 0, 128)
+BLEU_NUIT = (10, 10, 30)
+BLEU_CLAIRE = (0, 255, 255)
+VERT_VIF = (0, 200, 0)
+GRIS_FONCE = (60, 60, 60)
+GRIS_CLAIRE = (200, 200, 200)
+RED = (255, 0, 0)
+BLUE_SKY = (0, 191, 255)
+VIOLET = (128, 0, 128)
+YELLOW = (255, 255, 0)
+BLEU_TRES_FONCE = (0, 0, 30)
 
 # --- Initialisation ---
 pygame.init()
@@ -91,10 +106,10 @@ niveau_max = save_data.get("niveau_max", 1)
 score_max_sauvegarde = save_data.get("score_max", 0)
 
 # --- Fonctions d'affichage---
-def draw_text(text, x, y, color=(255, 255, 255)):
+def draw_text(text, x, y, color=WHITE):
     screen.blit(font.render(text, True, color), (x, y))
 
-def draw_centered_text(text, y, font, color=(255, 255, 255)):
+def draw_centered_text(text, y, font, color=WHITE):
     rendered = font.render(text, True, color)
     screen.blit(rendered, (WIDTH // 2 - rendered.get_width() // 2, y))
 
@@ -106,7 +121,7 @@ def show_level_select_screen():
     cols = 10
     rows = 7
     while selecting:
-        screen.fill((10, 10, 30))
+        screen.fill(BLEU_NUIT)
         draw_centered_text("Choisis ton niveau", 30, menu_font)
         for i in range(min(LEVEL_COUNT, cols * rows)):
             col = i % cols
@@ -115,9 +130,9 @@ def show_level_select_screen():
             y = 80 + row * (button_size + margin)
             rect = pygame.Rect(x, y, button_size, button_size)
             level_num = i + 1
-            color = (0, 200, 0) if level_num <= niveau_max else (60, 60, 60)
+            color = VERT_VIF if level_num <= niveau_max else GRIS_FONCE
             pygame.draw.rect(screen, color, rect)
-            label = font.render(str(level_num), True, (255, 255, 255))
+            label = font.render(str(level_num), True, WHITE)
             screen.blit(label, (x + 8, y + 5))
             if pygame.mouse.get_pressed()[0] and rect.collidepoint(pygame.mouse.get_pos()) and level_num <= niveau_max:
                 level = level_num
@@ -163,7 +178,7 @@ class Projectile:
         self.rect.y -= self.speed
         return self.rect.bottom > 0
     
-    def draw(self, surface, color=(255, 0, 0)):
+    def draw(self, surface, color=RED):
         pygame.draw.rect(surface, color, self.rect)
         
     def nbr_projectile(level) :
@@ -198,23 +213,30 @@ class Projectile:
         return new_projectiles
 
 class Enemy:
+    
     TYPES = {
-            "standard": {"color": (0, 255, 0), "size": (40, 30), "speed": 2, "hp": 1},
-            "fast": {"color": (255, 0, 0), "size": (30, 30), "speed": 3, "hp": 1},
-            "armored": {"color": (0, 0, 128), "size": (60, 50), "speed": 1.5, "hp": 3},
-        }
+            "standard": {"color": GREEN, "size": (40, 30), "speed": 2, "hp": 1},
+            "fast": {"color": RED, "size": (30, 30), "speed": 3, "hp": 1},
+            "armored": {"color": BLUE_NAVY, "size": (60, 50), "speed": 1.5, "hp": 3},
+    }
     
     def add_speed(level) :
         add = level*0.1
         return add
 
-    def __init__(self):
-        self.type = random.choices(
+    def __init__(self, level):
+        if level%10 == 0:
+            # Pour les niveaux 10, 20, 30, 40, 50, 60, 70........
+            self.type = 'standard'
+            self.attrs ={"color": RED, 'size': (70, 70), "speed": 3, "hp": 10}
+        else :
+            self.type = random.choices(
                 population=["standard", "fast", "armored"],
                 weights=[0.6, 0.25, 0.15]
             )[0]
-        self.attrs = Enemy.TYPES[self.type]
-        x = random.randint(0, WIDTH - self.attrs['size'][0])
+            self.attrs = Enemy.TYPES[self.type]
+
+        x = random.randint(0+2, WIDTH - self.attrs['size'][0]-2)
         self.rect = pygame.Rect(x, -self.attrs["size"][1], *self.attrs["size"])
         self.color = self.attrs["color"]
         self.speed = self.attrs["speed"] + Enemy.add_speed(level)
@@ -226,18 +248,24 @@ class Enemy:
         return self.rect.top < HEIGHT
 
 class Bonus:
-    COLORS = {'life': (0, 191, 255), 'triple_shot': (128, 0, 128), 'bomb': (255, 255, 0)}
+    COLORS = {'life': BLUE_SKY, 'triple_shot': VIOLET, 'bomb': YELLOW}
 
     def __init__(self, x, y, bonus_type):
         self.type = bonus_type
-        self.rect = pygame.Rect(x, y, 30, 30)
+        # self.rect = pygame.Rect(x, y, 30, 30)
+        # self.y = y
+        # self.x = x
+        self.ray = 20
+        self.rect = pygame.Rect(x, y, self.ray * 2, self.ray * 2)
 
     def move(self):
-        self.rect.y += 3
+        vitesse = pygame.Vector2(0, 4)
+        # self.y += 3
+        self.rect.move_ip(vitesse)
         return self.rect.top < HEIGHT
 
     def draw(self):
-        pygame.draw.rect(screen, self.COLORS[self.type], self.rect)
+        pygame.draw.circle(screen, self.COLORS[self.type], self.rect.center, self.ray)
 
 class Explosion:
     def __init__(self, rect):
@@ -255,7 +283,7 @@ def main():
     player = Player()
     projectiles, enemies, bonuses, explosions = [], [], [], []
     score, level = 0, 1
-    enemy_per_wave, enemies_spawned = 5, 0
+    enemy_per_wave, enemies_spawned = 5 + 1*level, 0
     last_enemy_spawn = pygame.time.get_ticks()
     enemy_spawn_delay = 1000
 
@@ -286,6 +314,7 @@ def main():
                     sauvegarder_progression(donnée_a_saugarde)
                 elif event.key == pygame.K_p and not game_over:
                     pause = not pause
+                    sauvegarder_progression(donnée_a_saugarde)
 
                 if pause :
                     if event.key == pygame.K_UP:
@@ -312,15 +341,23 @@ def main():
                             pygame.mixer.music.set_volume(volume)
 
         if start_screen:
-            screen.fill((0, 0, 30))
+            screen.fill(BLEU_TRES_FONCE)
             draw_centered_text("🚀 Space Blaster", HEIGHT // 3, title_font)
-            draw_centered_text("Appuie sur ESPACE pour commencer", HEIGHT // 2, info_font, (200, 200, 200))
+            draw_centered_text("Appuie sur ESPACE pour commencer", HEIGHT // 2, info_font, GRIS_CLAIRE)
             draw_text(f"Max Score : {score_max_sauvegarde}", 40, 20)
             draw_text(f"Niveau Max : {niveau_max}", WIDTH-250, 20)
             draw_centered_text(f"Développer par : ", HEIGHT-150, info_font)
             draw_centered_text(f" Jean DJANTA ", HEIGHT-120, info_font)
             draw_centered_text(f"jeansdjanta@hotmail.com", HEIGHT-90, info_font)
             pygame.display.flip()
+            pause = False # pour ne pas retourner à l'écran de pause
+            projectiles.clear()
+            enemies.clear()
+            explosions.clear()
+            bonuses.clear()
+            score = 0
+            level = 1
+            player.reset()
             continue
         
         if level_select :
@@ -339,7 +376,7 @@ def main():
 
         # Game over
         if game_over:
-            draw_centered_text("GAME OVER - Appuie sur R pour recommencer", HEIGHT // 2 - 50, font, (255, 255, 0))
+            draw_centered_text("GAME OVER - Appuie sur R pour recommencer", HEIGHT // 2 - 50, font, YELLOW)
             draw_text(f"Niveau : {level}", WIDTH//2, HEIGHT//2)
             draw_text(f"Score : {score}", WIDTH//2, HEIGHT//2 + 50)
             if keys[pygame.K_r]:
@@ -371,15 +408,23 @@ def main():
         # Apparition ennemis
         now = pygame.time.get_ticks()
         if now - last_enemy_spawn > enemy_spawn_delay and enemies_spawned < enemy_per_wave:
-            enemies.append(Enemy())
+            enemies.append(Enemy(level))
             enemies_spawned += 1
             last_enemy_spawn = now
+            
+        # Enemie par vague
+        if level <11 :
+                enemy_per_wave = 5 +  level
+        else :
+            enemy_per_wave = level
+        
+                
 
         if not enemies and enemies_spawned >= enemy_per_wave:
             level += 1
             # player.speed += 0.5*level
             # Enemy.level_add_speed += 0.1*level
-            enemy_per_wave += 1*level
+            # enemy_per_wave = 1*level
             enemies_spawned, enemy_spawn_delay = 0, max(300, enemy_spawn_delay - 15*level)
 
         # Mouvements ennemis et collisions
@@ -402,13 +447,48 @@ def main():
                     enemy.hp -= proj.damage
                     if enemy.hp <= 0 :
                         explosions.append(Explosion(enemy.rect))
-                        score += 3 if enemy.type == "armored" else 1
+                        score += enemy.attrs['hp']
                         sound_explosion.play()
                         projectiles.remove(proj)
                         enemies.remove(enemy)
-                        if random.random() < 0.3:
-                            bonus_type = random.choice(['life', 'triple_shot', 'bomb'])
-                            bonuses.append(Bonus(enemy.rect.centerx, enemy.rect.centery, bonus_type))
+                        
+                        # Les Bonuses
+                        if level < 11 :
+                            # Bonus ou pas
+                            Gbonus = random.choices([True, False], [0.25, 0.8])[0]
+                            # Type de Bonus
+                            if Gbonus :
+                                bonus_type = random.choices(
+                                    population=['life', 'triple_shot', 'bomb'],
+                                    weights=[0.25, 0.5, 0.25])[0]
+                                bonuses.append(Bonus(enemy.rect.centerx, enemy.rect.centery, bonus_type))
+                        elif level < 21 :
+                            # Bonus ou pas
+                            Gbonus = random.choices([True, False], [0.35, 0.65])[0]
+                            # Type de Bonus
+                            if Gbonus :
+                                bonus_type = random.choices(
+                                    population=['life', 'triple_shot', 'bomb'],
+                                    weights=[0.35, 0.25, 0.4])[0]
+                                bonuses.append(Bonus(enemy.rect.centerx, enemy.rect.centery, bonus_type))
+                        else :
+                            # Bonus ou pas
+                            if level < 31 :
+                                Gbonus = random.choices([True, False], [0.45, 0.55])[0]
+                            elif level < 41 :
+                                Gbonus = random.choices([True, False], [0.60, 0.4])[0]
+                            elif level < 51 :
+                                Gbonus = random.choices([True, False], [0.75, 0.25])[0]
+                            else :
+                                Gbonus = random.choices([True, False], [0.90, 0.1])[0]
+                            
+                            # Type de Bonus
+                            if Gbonus :
+                                bonus_type = random.choices(
+                                    population=['life', 'triple_shot', 'bomb'],
+                                    weights=[0.4, 0.1, 0.5])[0]
+                                bonuses.append(Bonus(enemy.rect.centerx, enemy.rect.centery, bonus_type))                        
+                            
                     break
 
         # Mises à jour des explosions
@@ -435,7 +515,8 @@ def main():
             player.triple_shot = False
 
         if player.bomb:
-            score += len(enemies)
+            for ene in enemies[:] :
+                score += ene.hp
             enemies.clear()
             player.bomb = False
             sound_explosion.play()
@@ -447,13 +528,14 @@ def main():
         for enemy in enemies:
             pygame.draw.rect(screen, enemy.color, enemy.rect)
         for e in explosions:
-            pygame.draw.ellipse(screen, (255, 0, 0), e.rect)
+            pygame.draw.ellipse(screen, RED, e.rect)
 
         draw_text(f"Score : {score}", 10, 10)
-        draw_text(f"Vies : {'*'*player.lives}", WIDTH - 120, 10, (255, 0, 0))
-        draw_text(f"Niveau : {level}", WIDTH // 2 - 60, 10, (0, 255, 255))
-        draw_text(f"v. player : {player.speed(level)}", 10, HEIGHT-30)
-        draw_text(f"V. Enemy : + {Enemy.add_speed(level) :.2f}", WIDTH-200, HEIGHT-30)
+        draw_text(f"Vies : {'*'*player.lives}", WIDTH - 120, 10, RED)
+        draw_text(f"Niveau : {level}", WIDTH // 2 - 60, 10, BLEU_CLAIRE)
+        draw_text(f"v. player : {player.speed(level):.2f}", 10, HEIGHT-35)
+        draw_text(f"Nbre Enemie : {enemy_per_wave}", WIDTH/2-150, HEIGHT-35)
+        draw_text(f"V. Enemy : + {Enemy.add_speed(level) :.2f}", WIDTH-200, HEIGHT-35)
         pygame.display.flip()
 
     pygame.quit()

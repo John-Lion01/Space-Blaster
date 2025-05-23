@@ -7,22 +7,27 @@ pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Test level shower !")
 
+# COLORS 
+COLORS = {
+    'BLACK' : (0, 0, 0),
+    'WHITE' : (255, 255, 255),
+    'GREEN' : (0, 255, 0),
+    'BLUE_NAVY' : (0, 0, 128),
+    'BLEU_NUIT' : (10, 10, 30),
+    'BLEU_CLAIRE' : (0, 255, 255),
+    'VERT_VIF' : (0, 200, 0),
+    'GRIS_FONCE' : (60, 60, 60),
+    'GRIS_CLAIRE' : (200, 200, 200),
+    'RED' : (255, 0, 0),
+    'BLUE_SKY' : (0, 191, 255),
+    'VIOLET' : (128, 0, 128),
+    'YELLOW' : (255, 255, 0),
+    'BLEU_TRES_FONCE' : (0, 0, 30)
+}
+
 while 1:
-    cols = 10
-    rows = 15
-    bs = 60
-    mg = 10
-    draw_centered_text("Choisis ton niveau", 30, pygame.font.SysFont(None, 48))
-    for i in range(cols*rows) :
-        # rang colonne & ligne
-        col = i%cols
-        row = i//rows
-        # x & y
-        x = 45 + col * (bs + mg)
-        y = 80 + row * (bs + mg)
-        rect = pygame.Rect(x, y, bs, bs)
-        pygame.draw.rect(screen, (0, 200, 0), rect)
-        
+    
+    
         for event in pygame.event.get() :
             if event.type == pygame.QUIT :
                 pygame.quit()
